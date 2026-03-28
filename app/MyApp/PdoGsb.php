@@ -257,6 +257,22 @@ class PdoGsb{
     }
 
 
+    /**
+     * Retourne les fiches validées à une date donnée (jour).
+     * Chaque entrée contient: idVisiteur, nom, prenom, mois.
+     * @param string $dateAuFormatYYYYMMDD
+     * @return array
+     */
+    public function getFichesValideesLe(string $dateAuFormatYYYYMMDD){
+        $req = "select v.id as idVisiteur, v.nom as nom, v.prenom as prenom, f.mois as mois
+                from fichefrais f
+                inner join visiteur v on v.id = f.idvisiteur
+                where f.idEtat = 'VA' and date(f.dateModif) = :d
+                order by v.nom, v.prenom, f.mois desc";
+        $stmt = $this->monPdo->prepare($req);
+        $stmt->execute([':d' => $dateAuFormatYYYYMMDD]);
+        return $stmt->fetchAll();
+    }
 
 
 

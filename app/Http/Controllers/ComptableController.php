@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use PdoGsb;
 use MyDate;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 class ComptableController extends Controller
 {
@@ -134,21 +135,36 @@ class ComptableController extends Controller
             'frais' => $lesFraisForfait,
         ];
 
-        if (class_exists('Dompdf\\Dompdf')) {
-            $html = view('comptable.pdf_export', $data)->render();
-            $dompdf = new \Dompdf\Dompdf();
-            $dompdf->loadHtml($html);
-            $dompdf->setPaper('A4', 'portrait');
-            $dompdf->render();
+        $filename = 'etat_quotidien_' . $leMois . '_' . $idVisiteur . '.pdf';
+        return Pdf::view('comptable.pdf_export', $data)
+            ->format('a4')
+            ->download($filename);
+    }
 
-            $filename = 'etat_quotidien_' . $leMois . '_' . $idVisiteur . '.pdf';
-            return response($dompdf->output(), 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"'
-            ]);
+    
+    public function exporterValideesAujourdhui()
+    {
+        $today = date('Y-m-d');
+        $fiches = PdoGsb::getFichesValideesLe($today);
+
+        $details = [];
+        foreach ($fiches as $fiche) {
+            $idVisiteur = $fiche['idVisiteur'];
+            $mois = $fiche['mois'];
+            $details[] = [
+                'idVisiteur' => $idVisiteur,
+                'nom' => $fiche['nom'],
+                'prenom' => $fiche['prenom'],
+                'mois' => $mois,
+                'infos' => PdoGsb::getLesInfosFicheFrais($idVisiteur, $mois),
+                'frais' => PdoGsb::getLesFraisForfait($idVisiteur, $mois),
+            ];
         }
 
-        return view('comptable.pdf_export', $data);
+        return Pdf::view('comptable.journal_valide_aujourdhui', [
+            'date' => $today,
+            'details' => $details,
+        ])->format('a4')->download("etat_valide_{$today}.pdf");
     }
 }
 

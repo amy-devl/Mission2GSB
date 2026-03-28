@@ -1,6 +1,7 @@
 @extends ('comptable.selection')
 @section('contenu2')
 
+<div id="contenu">
 <h3>Fiche de frais du mois {{ $numMois }}-{{ $numAnnee }}</h3>
 <div class="encadre">
   @if(isset($message) && $message)
@@ -12,7 +13,7 @@
     Etat : <strong>{{ $libEtat }} depuis le {{ $dateModif }} </strong>
     <br> Montant validé : <strong>{{ $montantValide }} </strong>
     <br> Justificatifs : <strong>{{ $nbJustificatifs }}</strong>
-  </p>
+  </p>  
   <table class="listeLegere">
     <caption>Eléments forfaitisés</caption>
     <tr>
@@ -33,6 +34,7 @@
     <input type="hidden" name="leMois" value="{{ $leMois }}"/>
     <input type="submit" value="Valider la fiche"/>
   </form>
+</div>
 </div>
 @endsection
 

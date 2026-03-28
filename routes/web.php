@@ -31,5 +31,7 @@ Route::controller(ComptableController::class)->group(function () {
     Route::post('/comptable/valider', 'validerFiche')->name('chemin_comptable_valider');
     Route::get('/comptable/etat-quotidien', 'genererEtatQuotidien')->name('chemin_etat_quotidien');
     Route::post('/comptable/etat-quotidien', 'telechargerEtat')->name('chemin_etat_quotidien_dl');
+    Route::get('/comptable/validees-aujourdhui.pdf', 'exporterValideesAujourdhui')->name('chemin_validees_aujourdhui_pdf');
 });
 
+?>
